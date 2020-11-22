@@ -7,7 +7,7 @@ trigger:
   branch:
   - master
   event:
-  - push
+  - tag
 
 steps:
 - name: build
@@ -30,7 +30,7 @@ trigger:
   branch:
   - master
   event:
-  - push
+  - tag
 
 steps:
 - name: build
@@ -66,5 +66,28 @@ steps:
       from_secret: DOCKERHUB_PASSWORD
     repo: viers/qt-static
     tags:
-      - latest
-      - '5.15.0'
+      - dev
+
+---
+kind: pipeline
+name: qt-static-arm-dev
+platform:
+  os: linux
+  arch: arm
+trigger:
+  branch:
+  - master
+  event:
+  - tag
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: Dockerfile.qt-static-new
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/qt-static
+    tags:
+      - dev

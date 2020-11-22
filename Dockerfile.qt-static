@@ -3,42 +3,26 @@ ENTRYPOINT ["/bin/bash"]
 
 RUN \
     apt -y update && \
-    apt -y upgrade && \
     apt -y install \
         '^libxcb.*-dev' \
-        freeglut3-dev \
-        iputils-ping \
+        libfontconfig1-dev \
+        libfreetype6-dev \
         libgl1-mesa-dev \
         libglu1-mesa-dev \
-        libjpeg-dev \
-        libmysqlclient-dev \
-        libnss3-dev \
-        libopus-dev \
-        libpng-dev \
-        libsqlite3-dev \
+        libx11-dev \
         libx11-xcb-dev \
-        libxcb-xinerama0-dev \
-        libxcb-xkb-dev \
         libxcb1-dev \
-        libxcursor-dev \
+        libxext-dev \
+        libxfixes-dev \
         libxi-dev \
         libxkbcommon-dev \
         libxkbcommon-x11-dev \
-        libxml2-dev \
         libxrender-dev \
-        libxslt-dev \
-        lzip \
         mesa-common-dev \
-        nano \
-        perl \
         python \
-        valgrind \
-        zlib1g-dev \
         && \
-    apt -y autoremove && \
-    apt -y autoclean && \
     apt -y clean && \
-    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &&  \
     exit 0
 
 RUN \
@@ -56,20 +40,20 @@ RUN \
         -confirm-license \
         -release \
         -static \
-        -nomake tools \
-        -nomake tests \
         -nomake examples \
-        -skip qtwebengine \
-        -qt-zlib \
+        -nomake tests \
+        -nomake tools \
+        -qt-freetype \
+        -qt-harfbuzz \
         -qt-libjpeg \
         -qt-libpng \
-        -xcb \
-        -qt-freetype \
         -qt-pcre \
-        -qt-harfbuzz \
+        -qt-zlib \
+        -skip qtwebengine \
+        -xcb \
     && \
     make -j $(($(nproc)+4)) && \
-    make install && \
+    make install clean && \
     cd /opt && \
     rm -rf qt-everywhere-src-5.15.0 && \
     exit 0

@@ -1,0 +1,26 @@
+FROM viers/qt-static:latest
+ENTRYPOINT ["/bin/bash"]
+
+RUN \
+    apt -y update && \
+    apt -y upgrade && \
+    apt -y install \
+        build-essential \
+        checkinstall \
+        libavcodec-dev \
+        libavutil-dev \
+        libc6-dev libssl-dev \
+        libexpat1-dev \
+        libgl-dev \
+        libgl1 \
+        libgl1-mesa-dev \
+        libglu1-mesa-dev \
+        libqt4-dev \
+        libx11-xcb-dev \
+        pkg-config \
+        qt5-default \
+        && \
+    ldconfig -v | grep -i GL && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    exit 0

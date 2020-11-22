@@ -9,10 +9,8 @@ RUN \
         libssl-dev \
         wget \
         && \
-    apt -y autoremove && \
-    apt -y autoclean && \
     apt -y clean && \
-    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &&  \
     exit 0
 
 RUN \
@@ -21,8 +19,4 @@ RUN \
     cd cmake-3.19.0 && \
     ./bootstrap && \
     make install clean && \
-    exit 0
-
-RUN \
-    cmake --version && \
     exit 0
