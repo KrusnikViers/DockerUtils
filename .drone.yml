@@ -1,0 +1,23 @@
+kind: pipeline
+name: auto-arm32
+platform:
+  os: linux
+  arch: arm
+trigger:
+  branch:
+  - master
+  event:
+  - push
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: Dockerfile.git
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/git
+    tags:
+      - latest
+      - 'arm-latest'
