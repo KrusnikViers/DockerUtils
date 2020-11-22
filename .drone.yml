@@ -1,5 +1,5 @@
 kind: pipeline
-name: auto-arm32
+name: cmake-arm
 platform:
   os: linux
   arch: arm
@@ -13,11 +13,57 @@ steps:
 - name: build
   image: plugins/docker
   settings:
-    dockerfile: Dockerfile.git
     username: viers
     password:
       from_secret: DOCKERHUB_PASSWORD
-    repo: viers/git
+    repo: viers/gcc-cmake
     tags:
       - latest
       - 'arm-latest'
+      - 'arm-3.19'
+
+---
+kind: pipeline
+name: build-agent
+trigger:
+  branch:
+  - master
+  event:
+  - push
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: Dockerfile.linux-build-agent
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/build-agent
+    tags:
+      - latest
+
+---
+kind: pipeline
+name: qt-static-arm
+platform:
+  os: linux
+  arch: arm
+trigger:
+  branch:
+  - master
+  event:
+  - push
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: Dockerfile.qt-static
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/qt-static
+    tags:
+      - latest
+      - '5.15.0'
