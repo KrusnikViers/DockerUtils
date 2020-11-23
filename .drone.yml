@@ -1,4 +1,28 @@
 kind: pipeline
+name: build-agent
+trigger:
+  branch:
+  - master
+  event:
+  - push
+  - cron
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: build-agent/build-agent.docker
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/build-agent
+    tags:
+      - latest
+
+
+
+---
+kind: pipeline
 name: gcc-cmake
 platform:
   os: linux
@@ -14,7 +38,7 @@ steps:
 - name: build
   image: plugins/docker
   settings:
-    dockerfile: gcc-cmake.docker
+    dockerfile: qt-static/gcc-cmake.docker
     username: viers
     password:
       from_secret: DOCKERHUB_PASSWORD
@@ -22,31 +46,17 @@ steps:
     tags:
       - latest
 
----
-kind: pipeline
-name: build-agent
-trigger:
-  branch:
-  - master
-  event:
-  - push
-  - cron
-
-steps:
-- name: build
-  image: plugins/docker
-  settings:
-    dockerfile: build-agent.docker
-    username: viers
-    password:
-      from_secret: DOCKERHUB_PASSWORD
-    repo: viers/build-agent
-    tags:
-      - latest
+- name: create-tag
+  image: drone/git:latest
+  environment:
+    GHUB_TOKEN:
+      from_secret: GHUB_TOKEN
+  commands:
+  - ./update_tag.sh gcc-cmake-ready
 
 ---
 kind: pipeline
-name: qt-static
+name: qt-static-deps
 platform:
   os: linux
   arch: arm
@@ -54,14 +64,49 @@ trigger:
   branch:
   - master
   event:
-  - push
-  - cron
+  - tag
+  ref:
+  - refs/tags/gcc-cmake-ready
 
 steps:
 - name: build
   image: plugins/docker
   settings:
-    dockerfile: qt-static.docker
+    dockerfile: qt-static/qt-deps.docker
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/qt-static
+    tags:
+      - internal-deps
+
+- name: create-tag
+  image: drone/git:latest
+  environment:
+    GHUB_TOKEN:
+      from_secret: GHUB_TOKEN
+  commands:
+  - ./update_tag.sh qt-deps-ready
+
+---
+kind: pipeline
+name: qt-static-build
+platform:
+  os: linux
+  arch: arm
+trigger:
+  branch:
+  - master
+  event:
+  - tag
+  ref:
+  - refs/tags/qt-deps-ready
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: qt-static/qt-static.docker
     username: viers
     password:
       from_secret: DOCKERHUB_PASSWORD

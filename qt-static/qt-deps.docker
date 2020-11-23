@@ -1,0 +1,31 @@
+FROM viers/gcc-cmake:latest
+ENTRYPOINT ["/bin/bash"]
+
+RUN \
+    apt -y update && \
+    apt -y upgrade && \
+    apt -y install \
+        '^libxcb.*-dev' \
+        build-essential \
+        libfontconfig1-dev \
+        libfreetype6-dev \
+        libgl1-mesa-dev \
+        libglu1-mesa-dev \
+        libssl-dev \
+        libx11-dev \
+        libx11-xcb-dev \
+        libxcb1-dev \
+        libxext-dev \
+        libxfixes-dev \
+        libxi-dev \
+        libxkbcommon-dev \
+        libxkbcommon-x11-dev \
+        libxrender-dev \
+        mesa-common-dev \
+        perl \
+        python \
+        wget \
+        && \
+    apt -y clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    exit 0
