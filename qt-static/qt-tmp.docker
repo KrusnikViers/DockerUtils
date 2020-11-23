@@ -1,0 +1,26 @@
+FROM viers/qt-static:latest
+ENTRYPOINT ["/bin/bash"]
+
+# ln -s /usr/lib/libGL.so.1 /usr/lib/arm-linux-gnueabihf/libGL.so.1 && \
+# ldd   /usr/lib/arm-linux-gnueabihf/libGL.so && \
+# libgles2-mesa-dev replaced by libglvnd-dev
+
+RUN \
+    apt -y update && \
+    apt -y install software-properties-common && \
+    add-apt-repository universe && \
+    apt -y update && \
+    apt -y upgrade && \
+    apt -y install \
+        freeglut3-dev \
+        libglvnd-dev \
+        libglfw3-dev \
+        libglu1-mesa-dev \
+        mesa-common-dev \
+        mesa-utils-extra \
+        && \
+    ln -s /usr/lib/arm-linux-gnueabihf/libGL.so.1.0.0 /usr/lib/libGL.so && \
+    ldconfig -p | grep libGL.so && \
+    ls -l /usr/lib/arm-linux-gnueabihf/libGL.so && \
+    ls -l /usr/lib/arm-linux-gnueabihf/libGL.so.1.0.0 && \
+    exit 0

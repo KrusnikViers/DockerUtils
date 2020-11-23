@@ -4,7 +4,6 @@ trigger:
   branch:
   - master
   event:
-  - push
   - cron
 
 steps:
@@ -31,7 +30,6 @@ trigger:
   branch:
   - master
   event:
-  - push
   - cron
 
 steps:
@@ -98,9 +96,7 @@ trigger:
   branch:
   - master
   event:
-  - tag
-  ref:
-  - refs/tags/qt-deps-ready
+  - push
 
 steps:
 - name: build
@@ -112,4 +108,28 @@ steps:
       from_secret: DOCKERHUB_PASSWORD
     repo: viers/qt-static
     tags:
-      - latest
+      - dev
+
+---
+kind: pipeline
+name: qt-experimental
+platform:
+  os: linux
+  arch: arm
+trigger:
+  branch:
+  - master
+  event:
+  - crone
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: qt-static/qt-tmp.docker
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/qt-static
+    tags:
+      - dev

@@ -13,6 +13,7 @@ RUN \
         -confirm-license \
         -release \
         -static \
+        -no-opengl \
         -nomake examples \
         -nomake tests \
         -nomake tools \
