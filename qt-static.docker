@@ -1,14 +1,16 @@
-FROM viers/gcc-cmake:arm-latest
+FROM viers/gcc-cmake:latest
 ENTRYPOINT ["/bin/bash"]
 
 RUN \
     apt -y update && \
     apt -y install \
         '^libxcb.*-dev' \
+        build-essential \
         libfontconfig1-dev \
         libfreetype6-dev \
         libgl1-mesa-dev \
         libglu1-mesa-dev \
+        libssl-dev \
         libx11-dev \
         libx11-xcb-dev \
         libxcb1-dev \
@@ -19,21 +21,16 @@ RUN \
         libxkbcommon-x11-dev \
         libxrender-dev \
         mesa-common-dev \
+        perl \
         python \
+        wget \
         && \
     apt -y clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &&  \
-    exit 0
-
-RUN \
     set -eux && \
     cd /opt && \
     wget -q http://download.qt.io/official_releases/qt/5.15/5.15.0/single/qt-everywhere-src-5.15.0.tar.xz && \
     tar xf qt-everywhere-src-5.15.0.tar.xz && \
     rm qt-everywhere-src-5.15.0.tar.xz && \
-    exit 0
-
-RUN \
     cd /opt/qt-everywhere-src-5.15.0 && \
     ./configure \
         -opensource \
@@ -56,6 +53,7 @@ RUN \
     make install clean && \
     cd /opt && \
     rm -rf qt-everywhere-src-5.15.0 && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     exit 0
 
 ENV PATH="${PATH}:/usr/local/Qt-5.15.0/bin"

@@ -1,5 +1,5 @@
 kind: pipeline
-name: cmake-arm
+name: gcc-cmake
 platform:
   os: linux
   arch: arm
@@ -7,21 +7,20 @@ trigger:
   branch:
   - master
   event:
-  - tag
+  - push
+  - cron
 
 steps:
 - name: build
   image: plugins/docker
   settings:
-    dockerfile: Dockerfile.cmake
+    dockerfile: gcc-cmake.docker
     username: viers
     password:
       from_secret: DOCKERHUB_PASSWORD
     repo: viers/gcc-cmake
     tags:
       - latest
-      - 'arm-latest'
-      - 'arm-3.19'
 
 ---
 kind: pipeline
@@ -30,13 +29,14 @@ trigger:
   branch:
   - master
   event:
-  - tag
+  - push
+  - cron
 
 steps:
 - name: build
   image: plugins/docker
   settings:
-    dockerfile: Dockerfile.linux-build-agent
+    dockerfile: build-agent.docker
     username: viers
     password:
       from_secret: DOCKERHUB_PASSWORD
@@ -46,7 +46,7 @@ steps:
 
 ---
 kind: pipeline
-name: qt-static-arm
+name: qt-static
 platform:
   os: linux
   arch: arm
@@ -55,39 +55,16 @@ trigger:
   - master
   event:
   - push
+  - cron
 
 steps:
 - name: build
   image: plugins/docker
   settings:
-    dockerfile: Dockerfile.qt-static
+    dockerfile: qt-static.docker
     username: viers
     password:
       from_secret: DOCKERHUB_PASSWORD
     repo: viers/qt-static
     tags:
-      - dev
-
----
-kind: pipeline
-name: qt-static-arm-dev
-platform:
-  os: linux
-  arch: arm
-trigger:
-  branch:
-  - master
-  event:
-  - tag
-
-steps:
-- name: build
-  image: plugins/docker
-  settings:
-    dockerfile: Dockerfile.qt-static-new
-    username: viers
-    password:
-      from_secret: DOCKERHUB_PASSWORD
-    repo: viers/qt-static
-    tags:
-      - dev
+      - latest

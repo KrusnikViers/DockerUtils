@@ -2,7 +2,6 @@ FROM ubuntu:18.04
 
 # Install basic dependencies and clear all post-installation temporary files.
 RUN apt -y update && \
-    apt -y upgrade && \
     apt -y install \
         build-essential \
         cmake \
