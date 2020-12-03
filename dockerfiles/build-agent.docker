@@ -1,10 +1,10 @@
-FROM ubuntu:18.04
+FROM viers/gcc-cmake:latest-amd64
 
 # Install basic dependencies and clear all post-installation temporary files.
 RUN apt -y update && \
+    apt -y upgrade && \
     apt -y install \
         build-essential \
-        cmake \
         file \
         libflac-dev \
         libfreetype6-dev \
@@ -21,6 +21,7 @@ RUN apt -y update && \
         libxrandr-dev \
         xvfb \
         && \
+    apt -y autoremove && \
     apt -y clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &&  \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     exit 0

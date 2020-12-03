@@ -1,7 +1,32 @@
-FROM viers/qt-static:internal-deps
+FROM viers/gcc-cmake:latest-arm32
 ENTRYPOINT ["/bin/bash"]
 
 RUN \
+    apt -y update && \
+    apt -y upgrade && \
+    apt -y install \
+        '^libxcb.*-dev' \
+        build-essential \
+        libfontconfig1-dev \
+        libfreetype6-dev \
+        libgl1-mesa-dev \
+        libglu1-mesa-dev \
+        libssl-dev \
+        libx11-dev \
+        libx11-xcb-dev \
+        libxcb1-dev \
+        libxext-dev \
+        libxfixes-dev \
+        libxi-dev \
+        libxkbcommon-dev \
+        libxkbcommon-x11-dev \
+        libxrender-dev \
+        mesa-common-dev \
+        perl \
+        python \
+        wget \
+        && \
+    apt -y clean && \
     set -eux && \
     cd /opt && \
     wget -q http://download.qt.io/official_releases/qt/5.15/5.15.0/single/qt-everywhere-src-5.15.0.tar.xz && \
@@ -13,7 +38,6 @@ RUN \
         -confirm-license \
         -release \
         -static \
-        -no-opengl \
         -nomake examples \
         -nomake tests \
         -nomake tools \

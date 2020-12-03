@@ -1,28 +1,5 @@
 kind: pipeline
-name: build-agent
-trigger:
-  branch:
-  - master
-  event:
-  - cron
-
-steps:
-- name: build
-  image: plugins/docker
-  settings:
-    dockerfile: build-agent/build-agent.docker
-    username: viers
-    password:
-      from_secret: DOCKERHUB_PASSWORD
-    repo: viers/build-agent
-    tags:
-      - latest
-
-
-
----
-kind: pipeline
-name: gcc-cmake
+name: gcc-cmake-arm32
 platform:
   os: linux
   arch: arm
@@ -31,17 +8,49 @@ trigger:
   - master
   event:
   - cron
+  - push
 
 steps:
 - name: build
   image: plugins/docker
   settings:
-    dockerfile: qt-static/gcc-cmake.docker
+    dockerfile: dockerfiles/gcc-cmake.docker
     username: viers
     password:
       from_secret: DOCKERHUB_PASSWORD
     repo: viers/gcc-cmake
     tags:
+      - latest-arm32
+
+- name: create-tag
+  image: drone/git:latest
+  environment:
+    GHUB_TOKEN:
+      from_secret: GHUB_TOKEN
+  commands:
+  - ./update_tag.sh gcc-cmake-arm32
+
+---
+kind: pipeline
+name: gcc-cmake-amd64
+trigger:
+  branch:
+  - master
+  event:
+  - cron
+  - push
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: dockerfiles/gcc-cmake.docker
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/gcc-cmake
+    tags:
+      - latest-amd64
       - latest
 
 - name: create-tag
@@ -50,11 +59,35 @@ steps:
     GHUB_TOKEN:
       from_secret: GHUB_TOKEN
   commands:
-  - ./update_tag.sh gcc-cmake-ready
+  - ./update_tag.sh gcc-cmake-amd64
 
 ---
 kind: pipeline
-name: qt-static-deps
+name: build-agent-amd64
+trigger:
+  branch:
+  - master
+  event:
+  - tag
+  ref:
+  - refs/tags/gcc-cmake-amd64
+
+steps:
+- name: build
+  image: plugins/docker
+  settings:
+    dockerfile: dockerfiles/build-agent.docker
+    username: viers
+    password:
+      from_secret: DOCKERHUB_PASSWORD
+    repo: viers/build-agent
+    tags:
+      - latest
+      - latest-amd64
+
+---
+kind: pipeline
+name: qt-static-arm32
 platform:
   os: linux
   arch: arm
@@ -64,72 +97,17 @@ trigger:
   event:
   - tag
   ref:
-  - refs/tags/gcc-cmake-ready
+  - refs/tags/gcc-cmake-arm32
 
 steps:
 - name: build
   image: plugins/docker
   settings:
-    dockerfile: qt-static/qt-deps.docker
+    dockerfile: dockerfiles/qt-static.docker
     username: viers
     password:
       from_secret: DOCKERHUB_PASSWORD
     repo: viers/qt-static
     tags:
-      - internal-deps
-
-- name: create-tag
-  image: drone/git:latest
-  environment:
-    GHUB_TOKEN:
-      from_secret: GHUB_TOKEN
-  commands:
-  - ./update_tag.sh qt-deps-ready
-
----
-kind: pipeline
-name: qt-static-build
-platform:
-  os: linux
-  arch: arm
-trigger:
-  branch:
-  - master
-  event:
-  - push
-
-steps:
-- name: build
-  image: plugins/docker
-  settings:
-    dockerfile: qt-static/qt-static.docker
-    username: viers
-    password:
-      from_secret: DOCKERHUB_PASSWORD
-    repo: viers/qt-static
-    tags:
-      - dev
-
----
-kind: pipeline
-name: qt-experimental
-platform:
-  os: linux
-  arch: arm
-trigger:
-  branch:
-  - master
-  event:
-  - crone
-
-steps:
-- name: build
-  image: plugins/docker
-  settings:
-    dockerfile: qt-static/qt-tmp.docker
-    username: viers
-    password:
-      from_secret: DOCKERHUB_PASSWORD
-    repo: viers/qt-static
-    tags:
-      - dev
+      - latest
+      - latest-arm32
