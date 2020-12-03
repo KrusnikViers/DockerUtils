@@ -1,5 +1,4 @@
 FROM ubuntu:18.04
-ENTRYPOINT ["/bin/bash"]
 
 RUN \
     apt -y update && \

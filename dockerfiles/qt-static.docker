@@ -1,5 +1,4 @@
 FROM viers/gcc-cmake:latest-arm32
-ENTRYPOINT ["/bin/bash"]
 
 RUN \
     apt -y update && \
